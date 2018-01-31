@@ -1,0 +1,259 @@
+\documentclass{beamer}
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  \definecolor{mcgarnet}{rgb}{0.38, 0, 0.08}
+  \definecolor{mcgray}{rgb}{0.6, 0.6, 0.6}
+  \setbeamercolor{structure}{fg=mcgarnet,bg=mcgray}
+  %\setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{graphicx}
+
+\newcommand{\imagesource}[1]{{\centering\hfill\break\hbox{\scriptsize \thinspace{\small\itshape #1}}\par}}
+
+\title{Advanced Magic - GDB}
+
+
+\author{Robert Lowe\\}
+
+\institute[Maryville College] % (optional, but mostly needed)
+{
+  Division of Mathematics and Computer Science\\
+  Maryville College
+}
+
+\date[]{}
+\subject{}
+
+\pgfdeclareimage[height=0.5cm]{university-logo}{images/Maryville-College}
+\logo{\pgfuseimage{university-logo}}
+
+
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+\end{frame}
+
+
+% Structuring a talk is a difficult task and the following structure
+% may not be suitable. Here are some rules that apply for this
+% solution: 
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+% - A conference audience is likely to know very little of what you
+%   are going to talk about. So *simplify*!
+% - In a 20min talk, getting the main ideas across is hard
+%   enough. Leave out details, even if it means being less precise than
+%   you think necessary.
+% - If you omit details that are vital to the proof/implementation,
+%   just say so once. Everybody will be happy with that.
+\section{Introduction to GDB}
+\begin{frame}
+    \frametitle{What is a debugger?}
+    \begin{columns}
+        \column{0.7\textwidth}
+        \begin{itemize}[<+->]
+            \item A debugger is a program that helps you
+                find and correcting errors in programs.
+            \item Debuggers typically:
+            \begin{itemize}
+                \item Allow programs to be stopped at
+                    fixed locations.
+                \item Step through a program.
+                \item Display program state.
+                \item Allow program state to be altered.
+                \item Allow post-mortem examination of a
+                    program's memory.
+            \end{itemize}
+        \end{itemize}
+        \column{0.3\textwidth}
+        \includegraphics[width=\textwidth]{images/archer}
+        \imagesource{www.gnu.org}
+    \end{columns}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Getting Started}
+    \begin{itemize}[<+->]
+       \item Before a program can be effectively debugged, we must put symbols\footnotemark in the object file by using the {\tt -g} option. 
+           \par{\tt g++ -g program.cpp -o program}
+       \item In a makefile, you can specify this with the
+           {\tt CXXFLAGS} variable.
+           \par{\tt CXXFLAGS=-g}
+       \item If you are using implicit makefile rules directly (without a makefile), you can specify {\tt -g} by setting an environment variable.
+           \par{\tt export CXXFLAGS=-g}
+       \item You invoke the debugger like this:
+           \par{\tt gdb program}
+    \end{itemize}
+    \footnotetext[1]{You can debug without symbols, but it will be in machine code!}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Listing Programs}
+    \begin{description}[<+->]
+        \item[list] List 10 lines of the program.  Repeating this command lists the next 10 lines.
+        \item[list {\it num}] List 10 lines with line number {\it num} in the middle.
+        \item[list {\it function}] List the source code of a given function.
+        \item[list {\it classname}::{\it function}] List 
+        the source code of a given class member function.
+        \item[list {\it source.cpp}:1] List the contents of
+        the source file {\it source.cpp} beginning at line 1.
+    \end{description}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Basics of the GDB User Interface}
+    \begin{itemize}[<+->]
+        \item Pressing enter without typing a command repeats the last command. 
+        \item Most commands have abbreviations.  Generally, this is the first letter of the command. (For example, {\tt list} is abbreviated as {\tt l})
+        \item gdb has an extensive help system.  This is accessed by the "help" command.  Try "help list".
+        \item Typing "help" by itself lists broad help categories.
+        \item You can scroll throw previous commands using your arrow keys.
+    \end{itemize}
+\end{frame}
+
+\section{Working with Breakpoints and Stepping Programs}
+\begin{frame}
+    \frametitle{Breakpoint Commands}
+    A {\bf breakpoint} is a location in a program where the
+    debugger will pause execution so you can have a look around.
+    \begin{description}[<+->]
+        \item[break {\it num}] Set a breakpoint at line {\it num}.
+        \item[break {\it num} if {\it condition}] Set a conditional breakpoint at line {\it num}.  The breakpoint stops only if the {\it condition} is met.  The condition follows the same syntax as C++ boolean expressions.
+        \item[info breakpoints] Display the list of 
+        breakpoints.
+        \item[delete breakpoints {\it num}] Delete breakpoint {\it num}.
+        \item[delete breakpoints] Delete all breakpoints.
+        \item[break *{\it address}] Advanced wizards only!  Break when execution reaches the specified memory address.
+    \end{description}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Running, Continuing, and Stopping Programs}
+    Once you have your breakpoints set up, it is time to run the program!
+    \begin{description}[<+->]
+        \item[run] Run the current program.  If the program is already running, it asks if you want to restart the program from the beginning.
+        \item[kill] Terminate the currently running program.
+        \item[continue] Continue execution of a paused program.
+        \item[Control + C] Pause the execution of a currently running program.  (Like a breakpoint, but from a key combination!)
+    \end{description}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Next and Step}
+    When a program is stopped, either at a breakpoint or 
+    through use of Control + c, you can step through it 
+    one line at a time.
+    \begin{description}[<+->]
+        \item[next] Execute the current line, stopping on the next line of code in the current function.  This command does not go into a function.
+        \item[step] Execute the current line, stopping on the next line of code.  If the next line of code is in a different function, step will go into the function and stop at its first line.  The name implies that it "steps into" functions.
+        \item[finish] Continue execution until just after the current function returns.
+    \end{description}
+\end{frame}
+
+\section{Displaying Data}
+\begin{frame}
+    \frametitle{Print and Display}
+    \begin{description}[<+->]
+        \item[print {\it exp}] Print the value of the expression one time.  
+        \item[display {\it exp}] Print the value of the expression every time the program stops.
+        \item[delete display {\it num}] Delete the display numbered {\it num}
+        \item[delete display] Delete all displays
+        \item[info display] List all auto-display expressions.
+        \item[disable display {\it num}] Disable display number {\it num}.
+        \item[disable display] Disable all displays.
+        \item[enable display {\it num}] Enable display {\it num}.
+        \item[enable display] Enable all display instructions.
+    \end{description}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Evaluating Expressions}
+    GDB expressions are processed in much the same way as 
+    c++ expressions.  They can contain:
+    \begin{itemize}[<+->]
+        \item Variable Names
+        \item Literal Values
+        \item Arithmetic Operations
+        \item Index Operations
+        \item Dereference Operations
+        \item Address of Operations
+        \item Function Calls
+    \end{itemize}
+    
+    \begin{description}[<+->]
+        \item[call {\it exp}] Call an expression.  This can handle void functions.  If the function returns something, the result is displayed.
+    \end{description}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Examining the Call Stack}
+    gdb provides a lot of handlers for exploring the 
+    function call stack.
+    \begin{description}[<+->]
+        \item[backtrace] List all stack frames up to this point in the code.
+        \item[frame {\it num}] Switch the debugger's context to the stack frame indicated by {\it num}. 
+        \item[up] Switch to the previous stack frame.
+        \item[down] Switch to the next stack frame.
+    \end{description}
+\end{frame}
+
+\section{Low Level Concepts}
+
+\begin{frame}
+    \frametitle{Examining Registers}
+    Registers are temporary holding locations in the CPU
+    which are used as a sort of "scratch pad" for programs to work with.  Some have special purposes.  GDB lets us examine them!
+    \begin{description}[<+->]
+        \item[info registers] Display all the registers.
+        \item[print \${\it register}] Print the register.
+        \item[display \${\it register}] Display the register.
+        \item[\${\it register}] Is generally how we use registers in expressions in gdb.
+    \end{description}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Machine Code Commands}
+    \begin{description}[<+->]
+        \item[nexti] Execute the current machine code
+        instruction, stopping at the next one.  Does not step into subroutines.
+        \item[stepi] Execute the current machine code instruction, stopping at the next one.  Steps into subroutines.
+        \item[x/{\it fmt} {\it address}] Examine the raw memory beginning at address, applying the given format.  
+            \begin{enumerate}
+                \item Repeat Count
+                \item Format letter: o(octal), x(hex), d(decimal), u(unsigned decimal), t(binary), f(float), a(address), i(instruction), c(char), s(string)
+                \item Size Letter: b(byte), h(halfword), w(word), g(giant, 8 bytes)
+            \end{enumerate}
+    \end{description}
+\end{frame}
+
+
+\end{document}
+
+

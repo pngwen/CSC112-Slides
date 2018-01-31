@@ -1,0 +1,9 @@
+<diagram program="umletino" version="14.2"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>420</x><y>130</y><w>270</w><h>30</h></coordinates><panel_attributes>Widget
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>420</x><y>210</y><w>270</w><h>120</h></coordinates><panel_attributes>Shape
+--
+- _complete : bool
+--
++ Shape( )
++ handleEvent( e : Event ) : void
++ addPoint( _x : int, _y : int ) : void &lt;&lt;pure virtual&gt;&gt;
++ isComplete( ) : bool</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>540</x><y>150</y><w>30</w><h>80</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element></diagram>

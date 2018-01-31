@@ -1,0 +1,329 @@
+\documentclass{beamer}
+\mode<presentation>
+{
+  \usetheme{Warsaw}
+  \definecolor{mcgarnet}{rgb}{0.38, 0, 0.08}
+  \definecolor{mcgray}{rgb}{0.6, 0.6, 0.6}
+  \setbeamercolor{structure}{fg=mcgarnet,bg=mcgray}
+  %\setbeamercovered{transparent}
+}
+
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{graphicx}
+
+\newcommand{\imagesource}[1]{{\centering\hfill\break\hbox{\scriptsize Image Source:\thinspace{\small\itshape wikipedia.org}}\par}}
+
+\title{Overloaded Operators, Functions, and Students}
+
+
+\author{Robert Lowe\\}
+
+\institute[Maryville College] % (optional, but mostly needed)
+{
+  Division of Mathematics and Computer Science\\
+  Maryville College
+}
+
+\date[]{}
+\subject{}
+
+\pgfdeclareimage[height=0.5cm]{university-logo}{images/Maryville-College}
+\logo{\pgfuseimage{university-logo}}
+
+
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+\end{frame}
+
+
+% Structuring a talk is a difficult task and the following structure
+% may not be suitable. Here are some rules that apply for this
+% solution: 
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+% - A conference audience is likely to know very little of what you
+%   are going to talk about. So *simplify*!
+% - In a 20min talk, getting the main ideas across is hard
+%   enough. Leave out details, even if it means being less precise than
+%   you think necessary.
+% - If you omit details that are vital to the proof/implementation,
+%   just say so once. Everybody will be happy with that.
+\section{Overloading Symbols}
+\begin{frame}
+    \frametitle{Symbol Overloading}
+    
+    \begin{itemize}
+        \item<2-> A symbol is {\bf overloaded} if it has multiple meanings.
+        \item<3-> Overloading is frequently called "ad-hoc polymorphism".
+        \item<4-> Also referred to as syntactic sugar.
+        \item<5-> Overloading is meant to keep code close to the actual
+          program domain.
+        \item<6-> Establishes different behaviors while allowing the 
+          programmer to express intent.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Overloaded Function Example: {\tt abs}}
+    \uncover<2->{
+        {\bf In C} 
+        \par {\tt int abs(int j);}
+        \par {\tt double fabs(double x);}
+    }
+    \vspace{0.25in} 
+    \par\uncover<3->{
+        {\bf In C++}
+        \par {\tt int abs(int j); }
+        \par {\tt double abs(double x);}
+    }
+\end{frame}
+
+\begin{frame}
+    \frametitle{C++ Function Signature}
+    {\bf A Normal Function Signature Consists Of}
+    \begin{itemize}
+        \item<2-> Name
+        \item<3-> Number of Parameters
+        \item<4-> Parameter Types
+    \end{itemize}
+    
+    \begin{block}{C++ Overloading Rules}
+        In C++, overloaded functions share the same name.  They
+        must vary in at least one other part of the normal signature.
+    \end{block}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{The Overloaded Accessor/Mutator Idiom}
+    \begin{verbatim}
+std::string firstName();
+void firstName(const std::string & _firstName);
+    \end{verbatim}
+    
+    \begin{itemize}[<+->]
+        \item Both functions have the same name {\tt firstName}
+        \item Both functions differ by number of arguments.
+        \item The compiler uses the function signature to determine which
+          function to execute.
+        \item Reusing the same name means less information for the
+          the programmer to remember!
+    \end{itemize}
+\end{frame}
+
+\section{Overloaded Operators}
+\begin{frame}
+    \frametitle{Operators as Functions}
+    \begin{itemize}[<+->]
+        \item An operator could be viewed as a function!
+        \item A binary operator takes two arguments:
+            \par{\tt a + b == add(a, b)}
+        \item A unary operator takes one argument:
+            \par{\tt ++a == increment(a)}
+        \item Like functions, operators can be overloaded.
+        \item Existing operators cannot be overridden, but you can 
+            overload types so long as they use at least one class or 
+            enumerated type.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Operator Overloading Syntax}
+    {\tt {\em <return\_type>} operator{\em <symbol>}({\em <parameters>})}
+    \vspace{0.25in}
+    \par {\bf Example an Overloaded < Operator}
+    \begin{verbatim}
+bool operator<(const PhoneRecord &lhs, 
+               const PhoneRecord &rhs)
+{
+    if(lhs.lastName() < rhs.lastName()) {
+        return true;
+    }
+    
+    return lhs.firstName() < rhs.firstName();
+}
+    \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Overloading Arithmetic Operators}
+    \begin{itemize}
+        \item \begin{verbatim}
+type operator+(const type &lhs, 
+               const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+type operator-(const type &lhs, 
+               const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+type operator*(const type &lhs, 
+               const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+type operator/(const type &lhs, 
+               const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+type operator%(const type &lhs, 
+               const type &rhs);\end{verbatim}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Overloading Increment and Decrement Operators}
+    {\bf Prefix Operators {\tt ++x;}}
+    \begin{itemize}
+        \item \begin{verbatim}type & operator++(type & lhs);\end{verbatim}
+        \item \begin{verbatim}type & operator--(type & lhs);\end{verbatim}
+    \end{itemize}
+    \vspace{0.25in}
+    \par{\bf Postfix Operators {\tt x++;}}
+    \begin{itemize}
+        \item \begin{verbatim}type operator++(type & lhs, int);\end{verbatim}
+        \item \begin{verbatim}type operator--(type & lhs, int);\end{verbatim}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Overloading Equality and Comparison Operators}
+    \begin{itemize}
+        \item \begin{verbatim}
+bool operator==(const type &lhs, 
+                const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+bool operator!=(const type &lhs, 
+                const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+bool operator<(const type &lhs, 
+               const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+bool operator<=(const type &lhs, 
+                const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+bool operator>(const type &lhs, 
+               const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+bool operator>=(const type &lhs, 
+                const type &rhs);\end{verbatim}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Overloading Assignment Operators}
+    \begin{itemize}
+        \item \begin{verbatim}
+type operator=(type &lhs, const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+type operator+=(type &lhs, const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+type operator-=(type &lhs, const type &rhs);\end{verbatim}
+        \item \begin{verbatim}
+type operator*=(type &lhs, const type &rhs);\end{verbatim}
+        \item and so on...
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Overloading Index Operators}
+    \begin{itemize}[<+->]
+        \item Often we want to create indexable containers. 
+        \item Consider vector indexing: {\tt v[0];}
+        \item This is an overloaded operator!:
+        \begin{verbatim}
+type & operator[](type &lhs, int index);
+        \end{verbatim}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Overloaded Stream Operators}
+    {\bf Insertion Operator}
+    \begin{verbatim}
+ostream &operator<<(ostream &os, const type &rhs);
+    \end{verbatim}
+    \vspace{0.10in}
+    \par{\bf Extraction Operator}
+    \begin{verbatim}
+istream &istream>>(istream &is, const type &rhs);
+    \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Overloaded Operators as Member Methods}
+    \begin{itemize}[<+->]
+        \item An overloaded operator can be a member method!
+        \item When an overloaded operator is a member method, the left
+          hand side is the current object. 
+        \item Only the right hand side is specified in the parameter list.
+        \item Example: The {\tt PhoneRecord}'s index operator.
+            \begin{verbatim}
+PhoneNumber & operator[](int index);
+            \end{verbatim}
+    \end{itemize}
+\end{frame}
+
+\section{Best Practices}
+\begin{frame}
+    \frametitle{Don't Mislead Users of Your Classes!}
+    \begin{itemize}[<+->]
+        \item Overloaded operators are meant to make code match its
+            problem domain.
+        \item Your overloaded operators should match the original 
+            purpose of the operator.
+        \item Avoid side effects, unless they are expected.
+        \item If an operator doesn't have an obvious relationship to 
+            your class's operations, don't overload it!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Meet User's Expectations!}
+    \begin{itemize}[<+->]
+        \item It is a good idea to overload at least assignment operators.
+        \item If your class is likely to have objects in a container, provide
+            at least {\tt == } and {\tt <} operators.
+        \item Insertion and Extraction Operators are sometimes expected,
+            but don't use them in situations where the I/O of the object
+            is not well defined.
+        \item If you do provide insertion and extraction operators, the
+            insertion operator's output should be valid input for the
+            extraction operator.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Keep it Inside the Class.}
+    \begin{itemize}[<+->]
+        \item Unless its impossible, operators should be member classes.
+        \item Operators that do not change the current object should be 
+            marked {\tt const}.
+        \item Avoid the use of {\tt friend} for insertion and extraction
+            operators.
+        \item If you find you must make a stream operator a {\tt friend},
+            chances are your class API is incomplete!
+    \end{itemize}
+\end{frame}
+\end{document}
+
+
